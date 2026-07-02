@@ -1,0 +1,86 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String
+  staffName String?
+  password  String
+  role      Role     @default(USER)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("users")
+}
+
+enum Role {
+  ADMIN
+  USER
+}
+
+model ImportedFile {
+  id         String      @id @default(cuid())
+  fileName   String
+  sheetName  String
+  year       Int
+  month      Int
+  importedAt DateTime    @default(now())
+  salesData  SalesData[]
+
+  @@unique([year, month])
+  @@map("imported_files")
+}
+
+model SalesData {
+  id             String       @id @default(cuid())
+  importedFileId String
+  importedFile   ImportedFile @relation(fields: [importedFileId], references: [id], onDelete: Cascade)
+  staffName      String
+
+  week1Orders Float?
+  week1Profit Float?
+  week1Rate   Float?
+  week2Orders Float?
+  week2Profit Float?
+  week2Rate   Float?
+  week3Orders Float?
+  week3Profit Float?
+  week3Rate   Float?
+  week4Orders Float?
+  week4Profit Float?
+  week4Rate   Float?
+  week5Orders Float?
+  week5Profit Float?
+  week5Rate   Float?
+
+  monthTotalOrders Float?
+  monthTotalProfit Float?
+  monthTotalRate   Float?
+  grandTotalOrders Float?
+  grandTotalProfit Float?
+  grandTotalRate   Float?
+
+  monthProfitCorrection Float?
+  cumulativeExpenses    Float?
+
+  targetOrdersMonth          Float?
+  targetProfitMonth          Float?
+  achievementRateOrders      Float?
+  achievementRateProfit      Float?
+  targetOrdersCumul          Float?
+  targetProfitCumul          Float?
+  achievementRateCumulOrders Float?
+  achievementRateCumulProfit Float?
+
+  createdAt DateTime @default(now())
+
+  @@map("sales_data")
+}
